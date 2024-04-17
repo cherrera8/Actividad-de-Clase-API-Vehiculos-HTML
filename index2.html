@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form>
+        <br>
+        Placa: <input type="text" id="txtPlac"><br>
+        Marca: <input type="text" id="txtMarc"><br>
+        Modelo: <input type="text" id="txtMod"><br>
+        <br>
+        <button type="button" id="btnList">Listar</button>
+        <button type="button" id="btnSearch">Buscar</button>
+        <button type="button" id="btnAdd">Agregar</button>
+        <button type="button" id="btnDel">Eliminar</button>
+    </form>
+</body>
+<script>
+    const btnList = document.getElementById('btnList');
+    const btnSearch = document.getElementById('btnSearch');
+    const btnAdd = document.getElementById('btnAdd');
+    const btnDel = document.getElementById('btnDel');
+    btnList.addEventListener('click', () =>
+    {
+        fetch('http://localhost:3000/carros')
+        .then(response => response.json())
+        .then(data => console.log(data));
+    });
+
+    btnAdd.addEventListener('click', () =>
+    {
+        const placa = document.getElementById('txtPlac').value;
+        const marca = document.getElementById('txtMarc').value;
+        const modelo = document.getElementById('txtMod').value;
+
+        var flag = false;
+
+        fetch('http://localhost:3000/carros')
+        .then(response => response.json())
+        .then(data =>
+        {
+            for (let i = 0; i < data.carros.length; i++)
+            {
+                if (data.carros[i].placa == placa)
+                {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (!flag)
+            {
+                fetch('http://localhost:3000/carros',
+                {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify
+                    ({
+                        placa: placa, 
+                        marca: marca, 
+                        modelo: modelo
+                    })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data));
+            }
+        });
+    });
+
+    btnDel.addEventListener('click', () =>
+    {
+        const placa = document.getElementById('txtPlac').value;
+
+        fetch(`http://localhost:3000/carros/${placa}`, {method: 'DELETE'})
+        .then(response => response.json())
+        .then(data => console.log(data));
+    });
+
+    btnSearch.addEventListener('click', () =>
+    {
+        const placa = document.getElementById('txtPlac').value;
+
+        fetch(`http://localhost:3000/carros/${placa}`)
+        .then(response => response.json())
+        .then(data => console.log(data));
+    });
+</script>
+</html>
